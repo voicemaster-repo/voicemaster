@@ -206,8 +206,9 @@ FROM node:18-alpine
 RUN npm install -g @voicemaster/server
 EXPOSE 3001
 CMD ["voicemaster-server", "--port", "3001"]
-Using systemd (Linux)
-ini
+```
+## Using systemd (Linux)
+```ini
 [Unit]
 Description=VoiceMaster Signaling Server
 After=network.target
@@ -221,12 +222,13 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-Browser	Support
-Chrome	Full
-Firefox	Full
-Edge	Full
-Safari	Full
-Opera	Full
+Browser	Support: 
+
+- Chrome	Full
+- Firefox	Full
+- Edge	    Full
+- Safari	Full
+- Opera	    Full
 
 ## Troubleshooting
 #No audio?
