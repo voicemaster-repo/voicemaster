@@ -127,9 +127,10 @@ npx @voicemaster/server --port 3001
 ```javascript
 import { SignalingServer } from '@voicemaster/server';
 const server = new SignalingServer(3001);
-Advanced Examples
-Push-to-talk
-javascript
+```
+## Advanced Examples
+## Push-to-talk
+```javascript
 let pttActive = false;
 
 document.addEventListener('keydown', (e) => {
