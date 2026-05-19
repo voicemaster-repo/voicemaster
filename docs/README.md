@@ -34,7 +34,7 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 ```bash
 npm install @voicemaster/core
 npm install @voicemaster/react
-npm install -g @voicemaster/server // if you project used React for coding
+npm install -g @voicemaster/server
 ```
 
 ## Quick Start
