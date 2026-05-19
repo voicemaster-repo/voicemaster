@@ -231,12 +231,14 @@ WantedBy=multi-user.target
 ```
 
 Browser	Support: 
-
-- Chrome	Full
-- Firefox	Full
-- Edge	    Full
-- Safari	Full
-- Opera	    Full
+| Browser | Supported |
+|-------|-------------|
+| `Chrome` | Full |
+| `Chrome` | Full |
+| `Firefox` | Full |
+| `Edge` | Full | 
+| `Safari` | Full |
+| `Opera` | Full | 
 
 ## Troubleshooting
 # No audio?
