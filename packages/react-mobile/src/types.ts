@@ -1,0 +1,21 @@
+export interface VoiceClientConfig {
+  signalingUrl: string;
+  roomId: string;
+  userId: string;
+  iceServers?: any[];
+  autoConnect?: boolean;
+}
+
+export interface VoiceEvents {
+  connected: () => void;
+  disconnected: () => void;
+  remoteStream: (stream: any) => void;
+  localStream: (stream: any) => void;
+  error: (error: Error) => void;
+  userJoined: (userId: string) => void;
+  userLeft: (userId: string) => void;
+  speaking: (userId: string) => void;
+  stoppedSpeaking: (userId: string) => void;
+}
+
+export type EventHandler<T extends keyof VoiceEvents> = VoiceEvents[T];

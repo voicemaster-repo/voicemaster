@@ -1,0 +1,224 @@
+import {
+  mediaDevices,
+  RTCPeerConnection,
+  RTCSessionDescription,
+  RTCIceCandidate,
+  MediaStream
+} from 'react-native-webrtc';
+
+export interface VoiceClientConfig {
+  signalingUrl: string;
+  roomId: string;
+  userId: string;
+  iceServers?: Array<{ urls: string | string[]; username?: string; credential?: string }>;
+  autoConnect?: boolean;
+}
+
+export class VoiceClientMobile {
+  private ws: WebSocket | null = null;
+  private peerConnection: RTCPeerConnection | null = null;
+  private localStream: MediaStream | null = null;
+  private remoteStream: MediaStream | null = null;
+  private eventHandlers: Map<string, Function[]> = new Map();
+  private roomId: string;
+  private userId: string;
+  private signalingUrl: string;
+  private iceServers: Array<{ urls: string | string[]; username?: string; credential?: string }>;
+
+  constructor(config: VoiceClientConfig) {
+    this.signalingUrl = config.signalingUrl;
+    this.roomId = config.roomId;
+    this.userId = config.userId;
+    this.iceServers = config.iceServers || [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' }
+    ];
+
+    if (config.autoConnect !== false) {
+      this.connect();
+    }
+  }
+
+  on(event: string, callback: Function): void {
+    if (!this.eventHandlers.has(event)) {
+      this.eventHandlers.set(event, []);
+    }
+    this.eventHandlers.get(event)!.push(callback);
+  }
+
+  private emit(event: string, ...args: any[]): void {
+    const handlers = this.eventHandlers.get(event);
+    if (handlers) {
+      handlers.forEach(cb => cb(...args));
+    }
+  }
+
+  async connect(): Promise<void> {
+    try {
+      await this.initMicrophone();
+      this.initPeerConnection();
+      this.initWebSocket();
+    } catch (error) {
+      this.emit('error', error);
+    }
+  }
+
+  private async initMicrophone(): Promise<void> {
+    this.localStream = await mediaDevices.getUserMedia({ audio: true });
+    this.emit('localStream', this.localStream);
+  }
+
+  private initPeerConnection(): void {
+    const configuration = { iceServers: this.iceServers };
+    this.peerConnection = new RTCPeerConnection(configuration);
+
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => {
+        this.peerConnection!.addTrack(track, this.localStream!);
+      });
+    }
+
+    // @ts-ignore
+    this.peerConnection.ontrack = (event: any) => {
+      this.remoteStream = event.streams[0];
+      if (this.remoteStream) {
+        this.emit('remoteStream', this.remoteStream);
+      }
+    };
+
+    // @ts-ignore
+    this.peerConnection.onicecandidate = (event: any) => {
+      if (event.candidate) {
+        this.send({
+          type: 'ice-candidate',
+          userId: this.userId,
+          roomId: this.roomId,
+          payload: event.candidate
+        });
+      }
+    };
+  }
+
+  private initWebSocket(): void {
+    const url = `${this.signalingUrl}?userId=${this.userId}&roomId=${this.roomId}`;
+    this.ws = new WebSocket(url);
+
+    this.ws.onopen = () => {
+      this.send({ type: 'join', roomId: this.roomId, userId: this.userId });
+      this.emit('connected');
+    };
+
+    this.ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      this.handleSignalingMessage(message);
+    };
+
+    this.ws.onclose = () => {
+      this.emit('disconnected');
+    };
+  }
+
+  private handleSignalingMessage(message: any): void {
+    switch (message.type) {
+      case 'user-joined':
+        if (message.userId !== this.userId) {
+          this.createOffer();
+          this.emit('userJoined', message.userId);
+        }
+        break;
+      case 'offer':
+        this.handleOffer(message);
+        break;
+      case 'answer':
+        this.handleAnswer(message);
+        break;
+      case 'ice-candidate':
+        this.handleIceCandidate(message);
+        break;
+      case 'user-left':
+        this.emit('userLeft', message.userId);
+        break;
+    }
+  }
+
+  private createOffer(): void {
+    this.peerConnection?.createOffer()
+      .then(offer => this.peerConnection!.setLocalDescription(offer))
+      .then(() => {
+        this.send({
+          type: 'offer',
+          userId: this.userId,
+          roomId: this.roomId,
+          payload: this.peerConnection!.localDescription
+        });
+      })
+      .catch(err => this.emit('error', err));
+  }
+
+  private handleOffer(message: any): void {
+    const offer = new RTCSessionDescription(message.payload);
+    this.peerConnection?.setRemoteDescription(offer)
+      .then(() => this.peerConnection!.createAnswer())
+      .then(answer => this.peerConnection!.setLocalDescription(answer))
+      .then(() => {
+        this.send({
+          type: 'answer',
+          userId: message.userId,
+          roomId: this.roomId,
+          payload: this.peerConnection!.localDescription
+        });
+      })
+      .catch(err => this.emit('error', err));
+  }
+
+  private handleAnswer(message: any): void {
+    const answer = new RTCSessionDescription(message.payload);
+    this.peerConnection?.setRemoteDescription(answer)
+      .catch(err => this.emit('error', err));
+  }
+
+  private handleIceCandidate(message: any): void {
+    const candidate = new RTCIceCandidate(message.payload);
+    this.peerConnection?.addIceCandidate(candidate)
+      .catch(err => console.warn('ICE candidate error', err));
+  }
+
+  private send(data: any): void {
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(data));
+    }
+  }
+
+  disconnect(): void {
+    if (this.ws) {
+      this.send({ type: 'leave', roomId: this.roomId, userId: this.userId });
+      this.ws.close();
+    }
+    if (this.peerConnection) {
+      this.peerConnection.close();
+      this.peerConnection = null;
+    }
+    if (this.localStream) {
+      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream = null;
+    }
+    this.emit('disconnected');
+  }
+
+  toggleMute(): void {
+    if (this.localStream) {
+      const audioTrack = this.localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+      }
+    }
+  }
+
+  isMuted(): boolean {
+    return this.localStream?.getAudioTracks()[0]?.enabled === false;
+  }
+
+  getUserId(): string {
+    return this.userId;
+  }
+}
