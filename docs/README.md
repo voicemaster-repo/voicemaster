@@ -231,8 +231,8 @@ Browser	Support:
 - Opera	    Full
 
 ## Troubleshooting
-#No audio?
- - Check microphone permissions in browser
+# No audio?
+- Check microphone permissions in browser
 - Allow microphone access in address bar
 
 ## Can't connect?
