@@ -22,11 +22,15 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 npm install @voicemaster/core
 npm install @voicemaster/react
 npm install -g @voicemaster/server
-Quick Start
+```
+
+## Quick Start
 1. Start the signaling server
-bash
+```bash
 npx @voicemaster/server --port 3001
-2. Use in your app
+```
+## 2. Use in your app
+```
 javascript
 import { VoiceClient } from '@voicemaster/core';
 
@@ -43,7 +47,9 @@ client.on('remoteStream', (stream) => {
 });
 
 client.connect();
-3. React example
+```
+## 3. React example
+```
 jsx
 import { useVoice } from '@voicemaster/react';
 
@@ -60,9 +66,11 @@ function VoiceChat() {
         </button>
     );
 }
-API Reference
-VoiceClient Methods
+```
+## API Reference
+# VoiceClient Methods
 Method	Description
+```
 connect()	Connect to room
 disconnect()	Leave room
 toggleMute()	Mute/unmute microphone
@@ -81,8 +89,9 @@ userLeft	userId	User left room
 speaking	userId	User started speaking
 stoppedSpeaking	userId	User stopped speaking
 error	Error	Error occurred
-useVoice Hook (React)
-typescript
+```
+## useVoice Hook (React)
+```typescript
 const {
     isConnected,      // boolean
     isMuted,          // boolean
@@ -98,13 +107,19 @@ const {
     userId: 'user-123',
     autoConnect: true
 });
-Signaling Server
-Command line
-bash
+```
+## Signaling Server
+
+#Command line
+
+```bash
 npx @voicemaster/server --port 3001
 npx @voicemaster/server --port 8080
-Programmatic usage
-javascript
+```
+
+## Programmatic usage
+
+```javascript
 import { SignalingServer } from '@voicemaster/server';
 const server = new SignalingServer(3001);
 Advanced Examples
@@ -125,8 +140,9 @@ document.addEventListener('keyup', (e) => {
         client.toggleMute();
     }
 });
-Voice activity indicator
-javascript
+```
+## Voice activity indicator
+```javascript
 client.on('speaking', (userId) => {
     showIndicator(userId, true);
 });
@@ -134,8 +150,11 @@ client.on('speaking', (userId) => {
 client.on('stoppedSpeaking', (userId) => {
     showIndicator(userId, false);
 });
-Custom STUN/TURN servers
-javascript
+```
+
+## Custom STUN/TURN servers
+
+```javascript
 const client = new VoiceClient({
     signalingUrl: 'ws://localhost:3001',
     roomId: 'my-room',
@@ -149,8 +168,11 @@ const client = new VoiceClient({
         }
     ]
 });
-Recording conversation
-javascript
+```
+
+## Recording conversation
+
+```javascript
 let mediaRecorder;
 const chunks = [];
 
@@ -168,13 +190,20 @@ function saveRecording() {
     a.download = `recording_${Date.now()}.webm`;
     a.click();
 }
-Production Deployment
-Using PM2
-bash
+```
+
+## Production Deployment
+
+# Using PM2
+
+```bash
 pm2 start npx --name "voicemaster" -- @voicemaster/server --port 3001
 pm2 save
-Using Docker
-dockerfile
+```
+
+## Using Docker
+
+```dockerfile
 FROM node:18-alpine
 RUN npm install -g @voicemaster/server
 EXPOSE 3001
@@ -192,40 +221,41 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-Browser Support
+```
+
 Browser	Support
 Chrome	Full
 Firefox	Full
 Edge	Full
 Safari	Full
 Opera	Full
-Troubleshooting
-No audio?
-Check microphone permissions in browser
 
-Allow microphone access in address bar
+## Troubleshooting
+#No audio?
+ - Check microphone permissions in browser
+- Allow microphone access in address bar
 
-Can't connect?
-Verify signaling server is running
+## Can't connect?
+- Verify signaling server is running
+- Check WebSocket connection in console (F12)
 
-Check WebSocket connection in console (F12)
+## Poor audio quality?
+- Use headphones to prevent echo
+- Check your internet connection speed
 
-Poor audio quality?
-Use headphones to prevent echo
-
-Check your internet connection speed
-
-API Protocol
-Client to Server
-json
+## API Protocol
+# Client to Server
+```json
 {"type": "join", "roomId": "string", "userId": "string"}
 {"type": "signal", "userId": "string", "payload": "any"}
 {"type": "leave", "roomId": "string", "userId": "string"}
-Server to Client
-json
+```
+# Server to Client
+```json
 {"type": "user-joined", "userId": "string", "payload": {"users": []}}
 {"type": "signal", "userId": "string", "payload": "any"}
 {"type": "user-left", "userId": "string"}
+```
 License
 MIT (c) Sergey Minasyan
 
