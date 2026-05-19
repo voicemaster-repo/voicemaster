@@ -116,11 +116,10 @@ const {
 ```
 ## Signaling Server
 
-#Command line
+# Command line
 
 ```bash
 npx @voicemaster/server --port 3001
-npx @voicemaster/server --port 8080
 ```
 
 ## Programmatic usage
