@@ -50,7 +50,7 @@ client.connect();
 ```
 ## 3. React example
 ```
-jsx
+javascript
 import { useVoice } from '@voicemaster/react';
 
 function VoiceChat() {
