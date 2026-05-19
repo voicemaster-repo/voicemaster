@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceFlow Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui;
+            background: linear-gradient(135deg, #0a0a0f, #1a1a2e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 30px;
+            width: 400px;
+            text-align: center;
+            color: white;
+        }
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+        }
+        input {
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        button {
+            background: linear-gradient(135deg, #a855f7, #e879f9);
+            color: white;
+            cursor: pointer;
+        }
+        .status {
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+        }
+        .connected { background: #10b981; }
+        .connecting { background: #f59e0b; }
+        .peer {
+            padding: 8px;
+            margin: 8px 0;
+            background: rgba(168,85,247,0.3);
+            border-radius: 8px;
+        }
+        .speaking {
+            background: #22c55e;
+            color: black;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎙️ VoiceFlow</h1>
+        <input type="text" id="name" placeholder="Ваше имя">
+        <input type="text" id="room" placeholder="Комната" value="default">
+        <button id="connect">Подключиться</button>
+        <div id="status" class="status">⚫ Отключено</div>
+        <div id="peers"></div>
+        <button id="mute" style="display:none">🔇 Заглушить</button>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "@voiceflow/core": "../packages/core/dist/index.mjs"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { VoiceClient } from '@voiceflow/core';
+        
+        let client = null;
+        let currentName = '';
+        
+        const connectBtn = document.getElementById('connect');
+        const muteBtn = document.getElementById('mute');
+        const statusDiv = document.getElementById('status');
+        const peersDiv = document.getElementById('peers');
+        const nameInput = document.getElementById('name');
+        const roomInput = document.getElementById('room');
+        
+        connectBtn.onclick = async () => {
+            const name = nameInput.value.trim() || `user_${Math.random().toString(36).substr(2, 4)}`;
+            const room = roomInput.value.trim() || 'default';
+            currentName = name;
+            nameInput.value = name;
+            
+            statusDiv.textContent = '🔄 Подключение...';
+            statusDiv.className = 'status connecting';
+            
+            client = new VoiceClient({
+                signalingUrl: 'ws://localhost:3001',
+                roomId: room,
+                userId: name
+            });
+            
+            client.on('connected', () => {
+                statusDiv.textContent = '🎙️ Подключено! Говорите';
+                statusDiv.className = 'status connected';
+                connectBtn.style.display = 'none';
+                muteBtn.style.display = 'block';
+            });
+            
+            client.on('disconnected', () => {
+                statusDiv.textContent = '⚫ Отключено';
+                statusDiv.className = 'status';
+                connectBtn.style.display = 'block';
+                muteBtn.style.display = 'none';
+                peersDiv.innerHTML = '';
+            });
+            
+            client.on('remoteStream', (stream) => {
+                const audio = new Audio();
+                audio.srcObject = stream;
+                audio.play();
+                console.log('✅ Аудиопоток получен');
+            });
+            
+            client.on('userJoined', (userId) => {
+                updatePeersList();
+            });
+            
+            client.on('userLeft', (userId) => {
+                updatePeersList();
+            });
+            
+            client.on('speaking', (userId) => {
+                updatePeersList();
+            });
+            
+            client.on('stoppedSpeaking', (userId) => {
+                updatePeersList();
+            });
+            
+            await client.connect();
+        };
+        
+        function updatePeersList() {
+            if (!client) return;
+            const peers = client.getPeers();
+            const speakingUsers = new Set(); // нужно будет хранить
+            peersDiv.innerHTML = peers.map(peer => `
+                <div class="peer">
+                    🗣️ ${peer}
+                </div>
+            `).join('');
+        }
+        
+        muteBtn.onclick = () => {
+            if (client) {
+                client.toggleMute();
+                muteBtn.textContent = client.isMuted() ? '🎤 Включить' : '🔇 Заглушить';
+            }
+        };
+    </script>
+</body>
+</html>

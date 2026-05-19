@@ -1,0 +1,37 @@
+{
+  "name": "@voicemaster/react",
+  "version": "1.0.0",
+  "description": "React hooks for VoiceMaster voice communication",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react --external @voicemaster/core",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external @voicemaster/core",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react",
+    "webrtc",
+    "voice",
+    "hooks"
+  ],
+  "author": "Sergey Minasyan",
+  "license": "MIT",
+  "peerDependencies": {
+    "@voicemaster/core": "^1.0.0",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

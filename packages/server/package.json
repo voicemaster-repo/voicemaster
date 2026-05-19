@@ -1,0 +1,32 @@
+{
+  "name": "@voicemaster/server",
+  "version": "1.0.2",
+  "description": "Signaling server for VoiceMaster voice communication",
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "bin": {
+    "voicemaster-server": "./dist/server.js"
+  },
+  "scripts": {
+    "build": "tsup src/server.ts --format cjs --dts --clean",
+    "dev": "tsup src/server.ts --format cjs --dts --watch",
+    "start": "node dist/server.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "webrtc",
+    "signaling",
+    "server",
+    "websocket"
+  ],
+  "author": "Sergey Minasyan",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  }
+}

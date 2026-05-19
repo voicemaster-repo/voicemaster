@@ -1,0 +1,26 @@
+{
+  "name": "@voiceflow/server",
+  "version": "1.0.0",
+  "description": "Signaling server for VoiceFlow",
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+  "bin": {
+    "voiceflow-server": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/server.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": ["webrtc", "signaling", "server", "websocket"],
+  "author": "Sergey Minasyan",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.0",
+    "typescript": "^5.3.0"
+  }
+}
