@@ -23,7 +23,7 @@ Simple WebRTC library for adding real-time voice chat to your web and mobile app
 |---------|------|--------------|
 | `@voicemaster/server` | **Signaling server** - helps peers connect | Run on your VPS/server |
 | `@voicemaster/core` | **Client library** - WebRTC voice logic | Install in your web app |
-| `@voicemaster/react` | **React bindings** - hooks for React apps | Install in React project |
+| `@voicemaster/react` | **React bindings** - hooks for React apps | Install in React web project |
 | `@voicemaster/react-mobile` | **React Native bindings** - hooks for mobile apps | Install in React Native / Expo project |
 
 ## Quick Summary
