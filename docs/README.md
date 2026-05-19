@@ -1,5 +1,9 @@
 # VoiceMaster - WebRTC Voice Communication Library
 
+[![npm version](https://img.shields.io/npm/v/@voicemaster/core)](https://www.npmjs.com/package/@voicemaster/core)
+[![npm downloads](https://img.shields.io/npm/dm/@voicemaster/core)](https://www.npmjs.com/package/@voicemaster/core)
+[![GitHub repo](https://img.shields.io/badge/GitHub-voicemaster--repo-blue)](https://github.com/voicemaster-repo/voicemaster)
+
 Simple WebRTC library for adding real-time voice chat to your web applications.
 
 ## Features
@@ -14,18 +18,16 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 
 ## Installation
 
+```bash
 npm install @voicemaster/core
 npm install @voicemaster/react
 npm install -g @voicemaster/server
-
-## Quick Start
-
-### 1. Start the signaling server
-
+Quick Start
+1. Start the signaling server
+bash
 npx @voicemaster/server --port 3001
-
-### 2. Use in your app
-
+2. Use in your app
+javascript
 import { VoiceClient } from '@voicemaster/core';
 
 const client = new VoiceClient({
@@ -41,9 +43,8 @@ client.on('remoteStream', (stream) => {
 });
 
 client.connect();
-
-### 3. React example
-
+3. React example
+jsx
 import { useVoice } from '@voicemaster/react';
 
 function VoiceChat() {
@@ -55,62 +56,60 @@ function VoiceChat() {
 
     return (
         <button onClick={toggleMute}>
-            {isConnected ? 'Talk' : 'Connect'}
+            {isConnected ? '🎙️ Talk' : '🔌 Connect'}
         </button>
     );
 }
-
-## API Reference
-
-### VoiceClient Methods
-
-- connect() - Connect to room
-- disconnect() - Leave room
-- toggleMute() - Mute/unmute microphone
-- isMuted() - Check mute status
-- getPeers() - Get list of connected users
-- getUserId() - Get current user ID
-- setSpeakingThreshold(threshold) - Adjust VAD sensitivity
-
-### Events
-
-- connected - Connected to room
-- disconnected - Disconnected
-- remoteStream - Incoming audio stream
-- localStream - Your microphone stream
-- userJoined - User joined room
-- userLeft - User left room
-- speaking - User started speaking
-- stoppedSpeaking - User stopped speaking
-- error - Error occurred
-
-### useVoice Hook (React)
-
-- isConnected - boolean
-- isMuted - boolean
-- remoteStream - MediaStream or null
-- peers - string[]
-- speakingUsers - Set(string)
-- connect() - function
-- disconnect() - function
-- toggleMute() - function
-
-## Signaling Server
-
-### Command line
-
+API Reference
+VoiceClient Methods
+Method	Description
+connect()	Connect to room
+disconnect()	Leave room
+toggleMute()	Mute/unmute microphone
+isMuted()	Check mute status
+getPeers()	Get list of connected users
+getUserId()	Get current user ID
+setSpeakingThreshold(threshold)	Adjust VAD sensitivity (0-1)
+Events
+Event	Payload	Description
+connected	-	Connected to room
+disconnected	-	Disconnected
+remoteStream	MediaStream	Incoming audio stream
+localStream	MediaStream	Your microphone stream
+userJoined	userId	User joined room
+userLeft	userId	User left room
+speaking	userId	User started speaking
+stoppedSpeaking	userId	User stopped speaking
+error	Error	Error occurred
+useVoice Hook (React)
+typescript
+const {
+    isConnected,      // boolean
+    isMuted,          // boolean
+    remoteStream,     // MediaStream | null
+    peers,            // string[]
+    speakingUsers,    // Set<string>
+    connect,          // () => void
+    disconnect,       // () => void
+    toggleMute        // () => void
+} = useVoice({
+    signalingUrl: 'ws://localhost:3001',
+    roomId: 'my-room',
+    userId: 'user-123',
+    autoConnect: true
+});
+Signaling Server
+Command line
+bash
 npx @voicemaster/server --port 3001
 npx @voicemaster/server --port 8080
-
-### Programmatic usage
-
+Programmatic usage
+javascript
 import { SignalingServer } from '@voicemaster/server';
 const server = new SignalingServer(3001);
-
-## Advanced Examples
-
-### Push-to-talk
-
+Advanced Examples
+Push-to-talk
+javascript
 let pttActive = false;
 
 document.addEventListener('keydown', (e) => {
@@ -126,9 +125,8 @@ document.addEventListener('keyup', (e) => {
         client.toggleMute();
     }
 });
-
-### Voice activity indicator
-
+Voice activity indicator
+javascript
 client.on('speaking', (userId) => {
     showIndicator(userId, true);
 });
@@ -136,9 +134,8 @@ client.on('speaking', (userId) => {
 client.on('stoppedSpeaking', (userId) => {
     showIndicator(userId, false);
 });
-
-### Custom STUN/TURN servers
-
+Custom STUN/TURN servers
+javascript
 const client = new VoiceClient({
     signalingUrl: 'ws://localhost:3001',
     roomId: 'my-room',
@@ -152,9 +149,8 @@ const client = new VoiceClient({
         }
     ]
 });
-
-### Recording conversation
-
+Recording conversation
+javascript
 let mediaRecorder;
 const chunks = [];
 
@@ -169,26 +165,22 @@ function saveRecording() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'recording.webm';
+    a.download = `recording_${Date.now()}.webm`;
     a.click();
 }
-
-## Production Deployment
-
-### Using PM2
-
+Production Deployment
+Using PM2
+bash
 pm2 start npx --name "voicemaster" -- @voicemaster/server --port 3001
 pm2 save
-
-### Using Docker
-
+Using Docker
+dockerfile
 FROM node:18-alpine
 RUN npm install -g @voicemaster/server
 EXPOSE 3001
 CMD ["voicemaster-server", "--port", "3001"]
-
-### Using systemd (Linux)
-
+Using systemd (Linux)
+ini
 [Unit]
 Description=VoiceMaster Signaling Server
 After=network.target
@@ -200,52 +192,46 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target
-
-## Browser Support
-
-Chrome - Full
-Firefox - Full
-Edge - Full
-Safari - Full
-Opera - Full
-
-## Troubleshooting
-
-### No audio?
-
+Browser Support
+Browser	Support
+Chrome	Full
+Firefox	Full
+Edge	Full
+Safari	Full
+Opera	Full
+Troubleshooting
+No audio?
 Check microphone permissions in browser
+
 Allow microphone access in address bar
 
-### Can't connect?
-
+Can't connect?
 Verify signaling server is running
+
 Check WebSocket connection in console (F12)
 
-### Poor audio quality?
-
+Poor audio quality?
 Use headphones to prevent echo
+
 Check your internet connection speed
 
-## API Protocol
-
-### Client to Server
-
+API Protocol
+Client to Server
+json
 {"type": "join", "roomId": "string", "userId": "string"}
 {"type": "signal", "userId": "string", "payload": "any"}
 {"type": "leave", "roomId": "string", "userId": "string"}
-
-### Server to Client
-
+Server to Client
+json
 {"type": "user-joined", "userId": "string", "payload": {"users": []}}
 {"type": "signal", "userId": "string", "payload": "any"}
 {"type": "user-left", "userId": "string"}
-
-## License
-
+License
 MIT (c) Sergey Minasyan
 
-## Links
+Links
+GitHub Repository: https://github.com/voicemaster-repo/voicemaster
 
-GitHub Repository: https://github.com/portside/voicemaster
 npm Registry: https://www.npmjs.com/package/@voicemaster/core
-Report Issue: https://github.com/portside/voicemaster/issues
+
+Report Issue: https://github.com/voicemaster-repo/voicemaster/issues
