@@ -30,8 +30,7 @@ npm install -g @voicemaster/server
 npx @voicemaster/server --port 3001
 ```
 ## 2. Use in your app
-```
-javascript
+```tsx
 import { VoiceClient } from '@voicemaster/core';
 
 const client = new VoiceClient({
@@ -49,8 +48,7 @@ client.on('remoteStream', (stream) => {
 client.connect();
 ```
 ## 3. React example
-```
-javascript
+```tsx
 import { useVoice } from '@voicemaster/react';
 
 function VoiceChat() {
