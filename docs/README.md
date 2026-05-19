@@ -66,44 +66,52 @@ function VoiceChat() {
 }
 ```
 ## API Reference
-# VoiceClient Methods
-Method	Description
-```
-connect()	Connect to room
-disconnect()	Leave room
-toggleMute()	Mute/unmute microphone
-isMuted()	Check mute status
-getPeers()	Get list of connected users
-getUserId()	Get current user ID
-setSpeakingThreshold(threshold)	Adjust VAD sensitivity (0-1)
-Events
-Event	Payload	Description
-connected	-	Connected to room
-disconnected	-	Disconnected
-remoteStream	MediaStream	Incoming audio stream
-localStream	MediaStream	Your microphone stream
-userJoined	userId	User joined room
-userLeft	userId	User left room
-speaking	userId	User started speaking
-stoppedSpeaking	userId	User stopped speaking
-error	Error	Error occurred
-```
-## useVoice Hook (React)
+
+### VoiceClient
+
+**Methods**
+
+| Method | Description |
+|--------|-------------|
+| `connect()` | Connect to room |
+| `disconnect()` | Leave room |
+| `toggleMute()` | Mute/unmute microphone |
+| `isMuted()` | Check mute status |
+| `getPeers()` | Get list of connected users |
+| `getUserId()` | Get current user ID |
+| `setSpeakingThreshold(threshold)` | Adjust VAD sensitivity (0-1) |
+
+**Events**
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `connected` | - | Connected to room |
+| `disconnected` | - | Disconnected |
+| `remoteStream` | `MediaStream` | Incoming audio stream |
+| `localStream` | `MediaStream` | Your microphone stream |
+| `userJoined` | `userId` | User joined room |
+| `userLeft` | `userId` | User left room |
+| `speaking` | `userId` | User started speaking |
+| `stoppedSpeaking` | `userId` | User stopped speaking |
+| `error` | `Error` | Error occurred |
+
+### useVoice Hook (React)
+
 ```typescript
 const {
-    isConnected,      // boolean
-    isMuted,          // boolean
-    remoteStream,     // MediaStream | null
-    peers,            // string[]
-    speakingUsers,    // Set<string>
-    connect,          // () => void
-    disconnect,       // () => void
-    toggleMute        // () => void
+    isConnected,      // boolean - connection status
+    isMuted,          // boolean - microphone muted
+    remoteStream,     // MediaStream | null - incoming audio
+    peers,            // string[] - list of users in room
+    speakingUsers,    // Set<string> - users currently speaking
+    connect,          // () => void - manual connect
+    disconnect,       // () => void - manual disconnect
+    toggleMute        // () => void - mute/unmute microphone
 } = useVoice({
-    signalingUrl: 'ws://localhost:3001',
-    roomId: 'my-room',
-    userId: 'user-123',
-    autoConnect: true
+    signalingUrl: 'ws://localhost:3001',  // required
+    roomId: 'my-room',                    // required
+    userId: 'user-123',                   // required
+    autoConnect: true                     // optional, default true
 });
 ```
 ## Signaling Server
