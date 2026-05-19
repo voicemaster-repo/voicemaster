@@ -25,7 +25,7 @@ npm install -g @voicemaster/server
 ```
 
 ## Quick Start
-1. Start the signaling server
+## 1. Start the signaling server
 ```bash
 npx @voicemaster/server --port 3001
 ```
