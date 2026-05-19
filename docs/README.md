@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/@voicemaster/core)](https://www.npmjs.com/package/@voicemaster/core)
 [![GitHub repo](https://img.shields.io/badge/GitHub-voicemaster--repo-blue)](https://github.com/voicemaster-repo/voicemaster)
 
-Simple WebRTC library for adding real-time voice chat to your web applications.
+Simple WebRTC library for adding real-time voice chat to your web and mobile applications.
 
 ## Features
 
@@ -12,6 +12,7 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 - Low latency - 20-50ms with Opus codec
 - TypeScript - Full type safety
 - React Hooks - First-class React support
+- React Native Hooks - Mobile support (iOS/Android)
 - Built-in VAD - Voice Activity Detection
 - Auto-reconnect - Handles network issues
 - P2P - No server load for voice transmission
@@ -23,18 +24,31 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 | `@voicemaster/server` | **Signaling server** - helps peers connect | Run on your VPS/server |
 | `@voicemaster/core` | **Client library** - WebRTC voice logic | Install in your web app |
 | `@voicemaster/react` | **React bindings** - hooks for React apps | Install in React project |
+| `@voicemaster/react-mobile` | **React Native bindings** - hooks for mobile apps | Install in React Native / Expo project |
 
 ## Quick Summary
 
 - **Server** (`@voicemaster/server`) - runs on your backend. One instance serves all users.
-- **Client** (`@voicemaster/core` or `@voicemaster/react`) - runs in user's browser.
+- **Client for web** (`@voicemaster/core` or `@voicemaster/react`) - runs in user's browser.
+- **Client for Mobile** (`@voicemaster/react-mobile`) - runs in React Native app (iOS/Android).
 
 ## Installation
-
+### For Web
 ```bash
 npm install @voicemaster/core
 npm install @voicemaster/react
 npm install -g @voicemaster/server
+```
+
+## For Mobile 
+```bash
+npm install @voicemaster/react-mobile react-native-webrtc
+cd ios && pod install
+```
+
+## For mobile (Expo)
+```bash
+npx expo install @voicemaster/react-mobile react-native-webrtc @config-plugins/react-native-webrtc expo-build-properties
 ```
 
 ## Quick Start
@@ -60,7 +74,7 @@ client.on('remoteStream', (stream) => {
 
 client.connect();
 ```
-## 3. React example
+## 3. React Native example (web)
 ```tsx
 import { useVoice } from '@voicemaster/react';
 
@@ -78,6 +92,75 @@ function VoiceChat() {
     );
 }
 ```
+
+## 4. React Native example (Mobile)
+```tsx
+import { useVoiceMobile } from '@voicemaster/react-mobile';
+import { View, Text, Button } from 'react-native';
+
+function VoiceChat() {
+    const { isConnected, toggleMute, disconnect } = useVoiceMobile({
+        signalingUrl: 'ws://localhost:3001',
+        roomId: 'my-room',
+        userId: 'user-123'
+    });
+
+    return (
+        <View>
+            <Text>{isConnected ? 'Connected' : 'Disconnected'}</Text>
+            <Button title="Mute" onPress={toggleMute} />
+            <Button title="Hang Up" onPress={disconnect} />
+        </View>
+    );
+}
+```
+
+## React Native / Expo Configuration
+### For bare React Native project
+Add permissions to ```android/app/src/main/AndroidManifest.xml```:
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+For iOS, add to ```ios/YourApp/Info.plist```:
+```xml
+<key>NSMicrophoneUsageDescription</key>
+<string>Need microphone access for voice calls</string>
+```
+
+### For Expo project
+Add to ```app.json```:
+```json
+{
+  "expo": {
+    "plugins": [
+      "@config-plugins/react-native-webrtc",
+      [
+        "expo-build-properties",
+        {
+          "android": { "minSdkVersion": 24 },
+          "ios": { "deploymentTarget": "15.1" }
+        }
+      ]
+    ]
+  }
+}
+```
+
+### Then build the app:
+```bash
+npx expo prebuild --clean
+npx expo run:android   # or npx expo run:ios
+```
+## ⚠️ Important for React Native
+
+### Does NOT work in Expo Go
+### Does NOT work in web browser
+### Works only on real device or emulator (iOS/Android)
+### Requires development build for Expo projects
+
+
 ## API Reference
 
 ### VoiceClient
@@ -108,7 +191,7 @@ function VoiceChat() {
 | `stoppedSpeaking` | `userId` | User stopped speaking |
 | `error` | `Error` | Error occurred |
 
-### useVoice Hook (React)
+### useVoice Hook (React Web)
 
 ```typescript
 const {
@@ -127,6 +210,24 @@ const {
     autoConnect: true                     // optional, default true
 });
 ```
+### useVoiceMobile Hook (React-Mobile)
+```typescript
+const {
+    isConnected,      // boolean - connection status
+    isMuted,          // boolean - microphone muted
+    remoteStream,     // MediaStream | null - incoming audio
+    speakingUsers,    // Set<string> - users currently speaking
+    connect,          // () => void - manual connect
+    disconnect,       // () => void - manual disconnect
+    toggleMute        // () => void - mute/unmute microphone
+} = useVoiceMobile({
+    signalingUrl: 'ws://localhost:3001',  // required
+    roomId: 'my-room',                    // required
+    userId: 'user-123',                   // required
+    autoConnect: true                     // optional, default true
+});
+```
+
 ## Signaling Server
 
 # Command line
@@ -257,6 +358,10 @@ Browser	Support:
 # No audio?
 - Check microphone permissions in browser
 - Allow microphone access in address bar
+
+# No audio on mobile?
+- Check app permissions in device settings
+- Ensure microphone permission is granted
 
 ## Can't connect?
 - Verify signaling server is running
