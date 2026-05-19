@@ -16,12 +16,25 @@ Simple WebRTC library for adding real-time voice chat to your web applications.
 - Auto-reconnect - Handles network issues
 - P2P - No server load for voice transmission
 
+## Packages Overview
+
+| Package | Role | Where to use |
+|---------|------|--------------|
+| `@voicemaster/server` | **Signaling server** - helps peers connect | Run on your VPS/server |
+| `@voicemaster/core` | **Client library** - WebRTC voice logic | Install in your web app |
+| `@voicemaster/react` | **React bindings** - hooks for React apps | Install in React project |
+
+## Quick Summary
+
+- **Server** (`@voicemaster/server`) - runs on your backend. One instance serves all users.
+- **Client** (`@voicemaster/core` or `@voicemaster/react`) - runs in user's browser.
+
 ## Installation
 
 ```bash
 npm install @voicemaster/core
 npm install @voicemaster/react
-npm install -g @voicemaster/server
+npm install -g @voicemaster/server // if you project used React for coding
 ```
 
 ## Quick Start
