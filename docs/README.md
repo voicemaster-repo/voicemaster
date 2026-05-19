@@ -153,7 +153,7 @@ Add to ```app.json```:
 npx expo prebuild --clean
 npx expo run:android   # or npx expo run:ios
 ```
-## ⚠️ Important for React Native
+## ⚠️ Important for React Native Mobile
 
 ### Does NOT work in Expo Go
 ### Does NOT work in web browser
