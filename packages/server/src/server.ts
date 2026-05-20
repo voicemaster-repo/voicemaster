@@ -16,7 +16,7 @@ export class SignalingServer {
   constructor(port: number = 3001) {
     const wss = new WebSocketServer({ port });
     
-    console.log(`🎙️ VoiceFlow Signaling Server`);
+    console.log(`🎙️ VoiceMaster Signaling Server`);
     console.log(`📡 WebSocket endpoint: ws://localhost:${port}`);
     console.log(`✅ Server started on port ${port}`);
     
