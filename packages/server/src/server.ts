@@ -34,7 +34,6 @@ export class SignalingServer {
       }
       this.rooms.get(roomId)!.set(userId, ws);
       
-      // Уведомить всех о новом пользователе
       this.broadcastToRoom(roomId, userId, {
         type: 'user-joined',
         roomId,
