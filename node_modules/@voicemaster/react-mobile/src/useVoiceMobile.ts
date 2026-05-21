@@ -1,0 +1,80 @@
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { VoiceClientMobile } from './VoiceClientMobile';
+
+interface UseVoiceMobileOptions {
+  signalingUrl: string;
+  roomId: string;
+  userId: string;
+  iceServers?: Array<{ urls: string | string[]; username?: string; credential?: string }>;
+  autoConnect?: boolean;
+}
+
+export function useVoiceMobile(options: UseVoiceMobileOptions) {
+  const [isConnected, setIsConnected] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
+  const [speakingUsers, setSpeakingUsers] = useState<Set<string>>(new Set());
+  const clientRef = useRef<VoiceClientMobile | null>(null);
+
+  useEffect(() => {
+    const client = new VoiceClientMobile({
+      signalingUrl: options.signalingUrl,
+      roomId: options.roomId,
+      userId: options.userId,
+      iceServers: options.iceServers,
+      autoConnect: false
+    });
+
+    client.on('connected', () => setIsConnected(true));
+    client.on('disconnected', () => {
+      setIsConnected(false);
+      setRemoteStream(null);
+      setSpeakingUsers(new Set());
+    });
+    client.on('remoteStream', (stream: MediaStream) => setRemoteStream(stream));
+    client.on('userLeft', (userId: string) => {
+      setSpeakingUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    });
+    client.on('speaking', (userId: string) => {
+      setSpeakingUsers(prev => new Set(prev).add(userId));
+    });
+    client.on('stoppedSpeaking', (userId: string) => {
+      setSpeakingUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    });
+    client.on('error', (error: Error) => console.error('Voice error:', error));
+
+    clientRef.current = client;
+
+    if (options.autoConnect !== false) {
+      client.connect();
+    }
+
+    return () => client.disconnect();
+  }, [options.signalingUrl, options.roomId, options.userId, options.iceServers]);
+
+  const connect = useCallback(() => clientRef.current?.connect(), []);
+  const disconnect = useCallback(() => clientRef.current?.disconnect(), []);
+  const toggleMute = useCallback(() => {
+    clientRef.current?.toggleMute();
+    setIsMuted(prev => !prev);
+  }, []);
+
+  return {
+    isConnected,
+    isMuted,
+    remoteStream,
+    speakingUsers,
+    connect,
+    disconnect,
+    toggleMute,
+    client: clientRef.current
+  };
+}

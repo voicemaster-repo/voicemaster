@@ -8,21 +8,12 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
-<<<<<<< HEAD
     "build:core": "npm run build --workspace=@voicemaster/core",
     "build:server": "npm run build --workspace=@voicemaster/server",
     "build:react": "npm run build --workspace=@voicemaster/react",
     "dev": "npm run dev --workspaces",
     "clean": "rm -rf packages/*/dist",
     "publish:all": "npm run build && npm publish --workspaces --access public"
-=======
-    "build:core": "npm run build --workspace=@voiceflow/core",
-    "build:server": "npm run build --workspace=@voiceflow/server",
-    "build:react": "npm run build --workspace=@voiceflow/react",
-    "dev": "npm run dev --workspaces",
-    "clean": "rm -rf packages/*/dist",
-    "publish:all": "npm run build && npm publish --workspaces"
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   },
   "devDependencies": {
     "typescript": "^5.3.0",

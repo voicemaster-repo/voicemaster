@@ -33,7 +33,6 @@ export function useVoice(options: UseVoiceOptions) {
       setRemoteStream(null);
     });
 
-<<<<<<< HEAD
     client.on('remoteStream', (stream: MediaStream) => {
       setRemoteStream(stream);
     });
@@ -43,17 +42,6 @@ export function useVoice(options: UseVoiceOptions) {
     });
 
     client.on('userLeft', (userId: string) => {
-=======
-    client.on('remoteStream', (stream) => {
-      setRemoteStream(stream);
-    });
-
-    client.on('userJoined', (userId) => {
-      setPeers(prev => [...prev, userId]);
-    });
-
-    client.on('userLeft', (userId) => {
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
       setPeers(prev => prev.filter(id => id !== userId));
       setSpeakingUsers(prev => {
         const newSet = new Set(prev);
@@ -62,19 +50,11 @@ export function useVoice(options: UseVoiceOptions) {
       });
     });
 
-<<<<<<< HEAD
     client.on('speaking', (userId: string) => {
       setSpeakingUsers(prev => new Set(prev).add(userId));
     });
 
     client.on('stoppedSpeaking', (userId: string) => {
-=======
-    client.on('speaking', (userId) => {
-      setSpeakingUsers(prev => new Set(prev).add(userId));
-    });
-
-    client.on('stoppedSpeaking', (userId) => {
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
       setSpeakingUsers(prev => {
         const newSet = new Set(prev);
         newSet.delete(userId);
@@ -82,11 +62,7 @@ export function useVoice(options: UseVoiceOptions) {
       });
     });
 
-<<<<<<< HEAD
     client.on('error', (error: unknown) => {
-=======
-    client.on('error', (error) => {
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
       console.error('Voice client error:', error);
     });
 

@@ -1,23 +1,16 @@
 {
   "name": "@voicemaster/react",
-<<<<<<< HEAD
   "version": "1.1.0",
-=======
-  "version": "1.0.0",
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "description": "React hooks for VoiceMaster voice communication",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-<<<<<<< HEAD
   "files": [
     "dist"
   ],
   "publishConfig": {
     "access": "public"
   },
-=======
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

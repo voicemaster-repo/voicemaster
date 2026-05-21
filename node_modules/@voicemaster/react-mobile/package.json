@@ -1,0 +1,42 @@
+{
+  "name": "@voicemaster/react-mobile",
+  "version": "1.0.0",
+  "description": "VoiceMaster for React Native - voice calls on iOS & Android",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "react-native",
+    "webrtc",
+    "voice",
+    "calls",
+    "mobile"
+  ],
+  "author": "Sergey Minasyan",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-native": ">=0.70.0",
+    "react-native-webrtc": "^124.0.7"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "@types/react-native-webrtc": "^1.75.9"
+  }
+}

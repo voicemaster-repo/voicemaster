@@ -1,23 +1,16 @@
 {
   "name": "@voicemaster/core",
-<<<<<<< HEAD
   "version": "1.0.13",
-=======
-  "version": "1.0.0",
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "description": "WebRTC voice communication core library",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
-<<<<<<< HEAD
   "files": [
     "dist"
   ],
   "publishConfig": {
     "access": "public"
   },
-=======
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -30,7 +23,6 @@
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "prepublishOnly": "npm run build"
   },
-<<<<<<< HEAD
   "keywords": [
     "webrtc",
     "voice",
@@ -38,21 +30,10 @@
     "p2p",
     "typescript"
   ],
-=======
-  "keywords": ["webrtc", "voice", "audio", "p2p", "typescript"],
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "author": "Sergey Minasyan",
   "license": "MIT",
-  "dependencies": {
-    "simple-peer": "^9.11.1"
-  },
   "devDependencies": {
-    "@types/simple-peer": "^9.11.8",
     "tsup": "^8.0.0",
     "typescript": "^5.3.0"
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
