@@ -1,0 +1,85 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+
+// src/server.ts
+var server_exports = {};
+__export(server_exports, {
+  SignalingServer: () => SignalingServer
+});
+module.exports = __toCommonJS(server_exports);
+var import_ws = require("ws");
+var import_crypto = require("crypto");
+var SignalingServer = class {
+  rooms = /* @__PURE__ */ new Map();
+  constructor(port2 = 3001) {
+    const wss = new import_ws.WebSocketServer({ port: port2 });
+    console.log("VoiceMaster signaling server started on port", port2);
+    wss.on("connection", (ws, req) => {
+      const url = new URL(req.url || "", `http://${req.headers.host}`);
+      const userId = url.searchParams.get("userId") || (0, import_crypto.randomUUID)();
+      const roomId = url.searchParams.get("roomId") || "default";
+      if (!this.rooms.has(roomId)) {
+        this.rooms.set(roomId, /* @__PURE__ */ new Map());
+      }
+      this.rooms.get(roomId).set(userId, ws);
+      this.broadcast(roomId, userId, {
+        type: "user-joined",
+        userId,
+        roomId
+      });
+      ws.on("message", (data) => {
+        try {
+          const message = JSON.parse(data.toString());
+          this.broadcast(roomId, userId, {
+            ...message,
+            userId
+          });
+        } catch (err) {
+          console.error("Failed to parse signaling message:", err);
+        }
+      });
+      ws.on("close", () => {
+        var _a, _b;
+        (_a = this.rooms.get(roomId)) == null ? void 0 : _a.delete(userId);
+        this.broadcast(roomId, userId, {
+          type: "user-left",
+          userId,
+          roomId
+        });
+        if (((_b = this.rooms.get(roomId)) == null ? void 0 : _b.size) === 0) {
+          this.rooms.delete(roomId);
+        }
+      });
+    });
+  }
+  broadcast(roomId, excludeUserId, message) {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    room.forEach((client, userId) => {
+      if (userId !== excludeUserId && client.readyState === import_ws.WebSocket.OPEN) {
+        client.send(JSON.stringify(message));
+      }
+    });
+  }
+};
+var port = parseInt(process.env.PORT || "3001", 10);
+new SignalingServer(port);
+// Annotate the CommonJS export names for ESM import in node:
+0 && (module.exports = {
+  SignalingServer
+});

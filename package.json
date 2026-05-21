@@ -1,0 +1,25 @@
+{
+  "name": "@voiceflow/monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "WebRTC voice communication library",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:core": "npm run build --workspace=@voicemaster/core",
+    "build:server": "npm run build --workspace=@voicemaster/server",
+    "build:react": "npm run build --workspace=@voicemaster/react",
+    "dev": "npm run dev --workspaces",
+    "clean": "rm -rf packages/*/dist",
+    "publish:all": "npm run build && npm publish --workspaces --access public"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "tsup": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

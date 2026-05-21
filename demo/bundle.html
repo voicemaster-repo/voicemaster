@@ -1,0 +1,339 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceMaster React Demo</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #0a0a16 0%, #171b32 100%);
+      color: #e5e7eb;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+    .app {
+      width: min(620px, 100%);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.45);
+      padding: 32px;
+      backdrop-filter: blur(16px);
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 2rem;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(124, 58, 237, 0.16);
+      border: 1px solid rgba(167, 139, 250, 0.24);
+      border-radius: 999px;
+      font-size: 0.875rem;
+    }
+    .form {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    label {
+      display: grid;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(15, 23, 42, 0.7);
+      color: #f8fafc;
+      font-size: 1rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: #a78bfa;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    button {
+      flex: 1 1 180px;
+      min-height: 50px;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary { background: linear-gradient(135deg, #7c3aed, #ec4899); color: #fff; }
+    .btn-secondary { background: rgba(148, 163, 184, 0.14); color: #f8fafc; }
+    .btn-danger { background: #ef4444; color: #fff; }
+    .status-bar {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 24px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(99, 102, 241, 0.16);
+    }
+    .status-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .status-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+    .status-disconnected { background: rgba(75, 85, 99, 0.24); color: #e2e8f0; }
+    .status-connected { background: rgba(34, 197, 94, 0.16); color: #bef264; }
+    .status-connecting { background: rgba(251, 191, 36, 0.16); color: #facc15; }
+    .error-text { color: #fca5a5; font-size: 0.95rem; }
+    .peers-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .peer-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+    .peer-card span:last-child { font-size: 0.9rem; color: #c7d2fe; }
+    .audio-visual { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app" id="root"></div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.3.1",
+        "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+        "@voicemaster/core": "../packages/core/dist/index.mjs",
+        "@voicemaster/react": "../packages/react/dist/index.mjs"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import React, { useEffect, useMemo, useRef, useState } from 'react';
+    import { createRoot } from 'react-dom/client';
+    import { useVoice } from '@voicemaster/react';
+
+    function App() {
+      const [name, setName] = useState(`guest_${Math.floor(Math.random() * 10000)}`);
+      const [room, setRoom] = useState('main');
+      const [statusText, setStatusText] = useState('⚫ Не в сети');
+      const [statusClass, setStatusClass] = useState('status-disconnected');
+      const [errorText, setErrorText] = useState('');
+      const [volume, setVolume] = useState(0.8);
+      const [started, setStarted] = useState(false);
+
+      const config = useMemo(
+        () => ({
+          signalingUrl: 'ws://localhost:3001',
+          roomId: room,
+          userId: name,
+          autoConnect: false
+        }),
+        [name, room]
+      );
+
+      const {
+        isConnected,
+        isMuted,
+        remoteStream,
+        peers,
+        speakingUsers,
+        connect,
+        disconnect,
+        toggleMute
+      } = useVoice(config);
+
+      const audioRef = useRef(null);
+
+      useEffect(() => {
+        if (remoteStream && audioRef.current) {
+          audioRef.current.srcObject = remoteStream;
+          audioRef.current.volume = volume;
+          audioRef.current.play().catch((error) => {
+            console.warn('Audio play failed:', error);
+          });
+        }
+      }, [remoteStream, volume]);
+
+      useEffect(() => {
+        if (isConnected) {
+          setStatusText('🟢 Подключено');
+          setStatusClass('status-connected');
+          setErrorText('');
+        } else if (started) {
+          setStatusText('⚫ Не в сети');
+          setStatusClass('status-disconnected');
+        }
+      }, [isConnected, started]);
+
+      const handleConnect = async () => {
+        if (!name.trim()) {
+          setErrorText('Введите имя пользователя.');
+          return;
+        }
+
+        if (!room.trim()) {
+          setErrorText('Введите название комнаты.');
+          return;
+        }
+
+        setStarted(true);
+        setErrorText('');
+        setStatusText('🔄 Подключение...');
+        setStatusClass('status-connecting');
+
+        try {
+          await connect();
+        } catch (error) {
+          console.error('Connect failed:', error);
+          setErrorText('Не удалось подключиться к серверу. Проверьте ws://localhost:3001');
+          setStatusText('❌ Ошибка подключения');
+          setStatusClass('status-disconnected');
+        }
+      };
+
+      const handleDisconnect = () => {
+        disconnect();
+        setStarted(false);
+        setStatusText('⚫ Не в сети');
+        setStatusClass('status-disconnected');
+      };
+
+      const handleToggleMute = () => {
+        toggleMute();
+      };
+
+      return (
+        React.createElement(React.Fragment, null,
+          React.createElement('div', { className: 'header' },
+            React.createElement('div', null,
+              React.createElement('h1', null, 'VoiceMaster React Demo'),
+              React.createElement('div', { className: 'badge' }, 'Использует @voicemaster/react + @voicemaster/core')
+            )
+          ),
+          React.createElement('div', { className: 'form' },
+            React.createElement('label', null,
+              'Ваше имя',
+              React.createElement('input', {
+                value: name,
+                onChange: (e) => setName(e.target.value),
+                placeholder: 'Введите имя'
+              })
+            ),
+            React.createElement('label', null,
+              'Комната',
+              React.createElement('input', {
+                value: room,
+                onChange: (e) => setRoom(e.target.value),
+                placeholder: 'Название комнаты'
+              })
+            )
+          ),
+          React.createElement('div', { className: 'actions' },
+            React.createElement('button', {
+              type: 'button',
+              className: 'btn-primary',
+              onClick: handleConnect,
+              disabled: isConnected
+            }, 'Подключиться'),
+            React.createElement('button', {
+              type: 'button',
+              className: 'btn-secondary',
+              onClick: handleToggleMute,
+              disabled: !isConnected
+            }, isMuted ? '🎤 Включить микрофон' : '🔇 Отключить микрофон'),
+            React.createElement('button', {
+              type: 'button',
+              className: 'btn-danger',
+              onClick: handleDisconnect,
+              disabled: !isConnected
+            }, 'Выйти')
+          ),
+          React.createElement('div', { className: 'status-bar' },
+            React.createElement('div', { className: 'status-row' },
+              React.createElement('div', null, React.createElement('strong', null, 'Статус:'), ' ', statusText),
+              React.createElement('div', { className: statusClass }, isConnected ? 'Подключено' : 'Отключено')
+            ),
+            errorText && React.createElement('div', { className: 'error-text' }, errorText),
+            React.createElement('div', { className: 'status-row' },
+              React.createElement('div', null, React.createElement('strong', null, 'Пользователи:'), ' ', peers.length),
+              React.createElement('div', null, React.createElement('strong', null, 'Громкость:'), ' ', Math.round(volume * 100), '%')
+            ),
+            React.createElement('label', { className: 'volume-slider' },
+              React.createElement('span', null, 'Настроить громкость'),
+              React.createElement('input', {
+                type: 'range',
+                min: 0,
+                max: 1,
+                step: 0.01,
+                value: volume,
+                onChange: (e) => setVolume(Number(e.target.value))
+              })
+            )
+          ),
+          peers.length > 0 && React.createElement('div', { className: 'peers-list' },
+            peers.map((peerId) => React.createElement('div', { key: peerId, className: 'peer-card' },
+              React.createElement('span', null, peerId),
+              React.createElement('span', null, speakingUsers.has(peerId) ? 'Говорит' : 'Ожидает')
+            ))
+          ),
+          React.createElement('audio', {
+            ref: audioRef,
+            className: 'audio-visual',
+            autoPlay: true,
+            controls: false
+          })
+        )
+      );
+    }
+
+    const rootElement = document.getElementById('root');
+    const root = createRoot(rootElement);
+    root.render(React.createElement(App));
+  </script>
+</body>
+</html>
