@@ -1,5 +1,6 @@
 {
   "name": "@voicemaster/server",
+<<<<<<< HEAD
   "version": "1.0.7",
   "description": "Signaling server for VoiceMaster voice communication",
   "main": "./dist/server.js",
@@ -10,6 +11,12 @@
   "publishConfig": {
     "access": "public"
   },
+=======
+  "version": "1.0.2",
+  "description": "Signaling server for VoiceMaster voice communication",
+  "main": "./dist/server.js",
+  "types": "./dist/server.d.ts",
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
   "bin": {
     "voicemaster-server": "./dist/server.js"
   },
@@ -28,7 +35,10 @@
   "author": "Sergey Minasyan",
   "license": "MIT",
   "dependencies": {
+<<<<<<< HEAD
     "@voicemaster/server": "^1.0.7",
+=======
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
     "ws": "^8.14.0"
   },
   "devDependencies": {

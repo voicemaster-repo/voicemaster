@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+#!/usr/bin/env node
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
@@ -26,17 +30,32 @@ var import_ws = require("ws");
 var import_crypto = require("crypto");
 var SignalingServer = class {
   rooms = /* @__PURE__ */ new Map();
+<<<<<<< HEAD
   constructor(port2 = 3001) {
     const wss = new import_ws.WebSocketServer({ port: port2 });
     console.log("VoiceMaster signaling server started on port", port2);
+=======
+  clients = /* @__PURE__ */ new Map();
+  constructor(port2 = 3001) {
+    const wss = new import_ws.WebSocketServer({ port: port2 });
+    console.log(`\u{1F399}\uFE0F VoiceFlow Signaling Server`);
+    console.log(`\u{1F4E1} WebSocket endpoint: ws://localhost:${port2}`);
+    console.log(`\u2705 Server started on port ${port2}`);
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
     wss.on("connection", (ws, req) => {
       const url = new URL(req.url || "", `http://${req.headers.host}`);
       const userId = url.searchParams.get("userId") || (0, import_crypto.randomUUID)();
       const roomId = url.searchParams.get("roomId") || "default";
+<<<<<<< HEAD
+=======
+      console.log(`\u{1F535} User ${userId} joined room ${roomId}`);
+      this.clients.set(ws, { userId, roomId });
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
       if (!this.rooms.has(roomId)) {
         this.rooms.set(roomId, /* @__PURE__ */ new Map());
       }
       this.rooms.get(roomId).set(userId, ws);
+<<<<<<< HEAD
       this.broadcast(roomId, userId, {
         type: "user-joined",
         userId,
@@ -51,10 +70,36 @@ var SignalingServer = class {
           });
         } catch (err) {
           console.error("Failed to parse signaling message:", err);
+=======
+      this.broadcastToRoom(roomId, userId, {
+        type: "user-joined",
+        roomId,
+        userId,
+        payload: { users: Array.from(this.rooms.get(roomId).keys()) }
+      });
+      ws.on("message", (data) => {
+        var _a;
+        try {
+          const message = JSON.parse(data.toString());
+          console.log(`\u{1F4E8} Message from ${userId}: ${message.type}`);
+          if (message.type === "signal") {
+            const targetWs = (_a = this.rooms.get(message.roomId)) == null ? void 0 : _a.get(message.userId);
+            if (targetWs && targetWs.readyState === import_ws.WebSocket.OPEN) {
+              targetWs.send(JSON.stringify({
+                type: "signal",
+                userId,
+                payload: message.payload
+              }));
+            }
+          }
+        } catch (err) {
+          console.error("Parse error:", err);
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
         }
       });
       ws.on("close", () => {
         var _a, _b;
+<<<<<<< HEAD
         (_a = this.rooms.get(roomId)) == null ? void 0 : _a.delete(userId);
         this.broadcast(roomId, userId, {
           type: "user-left",
@@ -73,11 +118,35 @@ var SignalingServer = class {
     room.forEach((client, userId) => {
       if (userId !== excludeUserId && client.readyState === import_ws.WebSocket.OPEN) {
         client.send(JSON.stringify(message));
+=======
+        console.log(`\u{1F534} User ${userId} left room ${roomId}`);
+        (_a = this.rooms.get(roomId)) == null ? void 0 : _a.delete(userId);
+        this.clients.delete(ws);
+        this.broadcastToRoom(roomId, userId, {
+          type: "user-left",
+          roomId,
+          userId,
+          payload: { users: Array.from(((_b = this.rooms.get(roomId)) == null ? void 0 : _b.keys()) || []) }
+        });
+      });
+    });
+  }
+  broadcastToRoom(roomId, excludeUserId, message) {
+    const room = this.rooms.get(roomId);
+    if (!room) return;
+    room.forEach((ws, userId) => {
+      if (userId !== excludeUserId && ws.readyState === import_ws.WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
       }
     });
   }
 };
+<<<<<<< HEAD
 var port = parseInt(process.env.PORT || "3001", 10);
+=======
+var port = parseInt(process.env.PORT || "3001");
+>>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
 new SignalingServer(port);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
