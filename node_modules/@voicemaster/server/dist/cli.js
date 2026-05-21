@@ -7,7 +7,7 @@ var SignalingServer = class {
   rooms = /* @__PURE__ */ new Map();
   constructor(port2 = 3001) {
     const wss = new import_ws.WebSocketServer({ port: port2 });
-    console.log("VoiceMaster signaling server started on port", port2);
+    console.log(`VoiceMaster signaling server started on port ${port2}`);
     wss.on("connection", (ws, req) => {
       const url = new URL(req.url || "", `http://${req.headers.host}`);
       const userId = url.searchParams.get("userId") || (0, import_crypto.randomUUID)();
@@ -58,7 +58,6 @@ var SignalingServer = class {
 };
 
 // src/cli.ts
-var port = parseInt(
-  process.argv.find((arg) => arg === "--port") ? process.argv[process.argv.indexOf("--port") + 1] : process.env.PORT || "3001"
-);
+var portIndex = process.argv.indexOf("--port");
+var port = portIndex !== -1 ? parseInt(process.argv[portIndex + 1]) : parseInt(process.env.PORT || "3001");
 new SignalingServer(port);

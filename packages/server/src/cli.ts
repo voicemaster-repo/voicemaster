@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 import { SignalingServer } from './server';
 
-const port = parseInt(
-  process.argv.find(arg => arg === '--port')
-    ? process.argv[process.argv.indexOf('--port') + 1]
-    : process.env.PORT || '3001'
-);
+const portIndex = process.argv.indexOf('--port');
+const port = portIndex !== -1 
+  ? parseInt(process.argv[portIndex + 1]) 
+  : parseInt(process.env.PORT || '3001');
 
 new SignalingServer(port);

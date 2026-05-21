@@ -28,7 +28,7 @@ var SignalingServer = class {
   rooms = /* @__PURE__ */ new Map();
   constructor(port = 3001) {
     const wss = new import_ws.WebSocketServer({ port });
-    console.log("VoiceMaster signaling server started on port", port);
+    console.log(`VoiceMaster signaling server started on port ${port}`);
     wss.on("connection", (ws, req) => {
       const url = new URL(req.url || "", `http://${req.headers.host}`);
       const userId = url.searchParams.get("userId") || (0, import_crypto.randomUUID)();

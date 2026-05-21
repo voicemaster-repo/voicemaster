@@ -7,7 +7,7 @@ export class SignalingServer {
   constructor(port: number = 3001) {
     const wss = new WebSocketServer({ port });
 
-    console.log('VoiceMaster signaling server started on port', port);
+    console.log(`VoiceMaster signaling server started on port ${port}`);
 
     wss.on('connection', (ws, req) => {
       const url = new URL(req.url || '', `http://${req.headers.host}`);
