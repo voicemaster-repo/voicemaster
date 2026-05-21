@@ -1,4 +1,4 @@
-import { WebSocketServer, WebSocket } from 'ws';
+﻿import { WebSocketServer, WebSocket } from 'ws';
 import { randomUUID } from 'crypto';
 
 export class SignalingServer {
@@ -63,6 +63,3 @@ export class SignalingServer {
     });
   }
 }
-
-const port = parseInt(process.env.PORT || '3001', 10);
-new SignalingServer(port);

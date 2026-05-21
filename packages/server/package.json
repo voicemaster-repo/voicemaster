@@ -1,6 +1,6 @@
 {
   "name": "@voicemaster/server",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Signaling server for VoiceMaster voice communication",
   "main": "./dist/server.js",
   "types": "./dist/server.d.ts",
@@ -11,12 +11,12 @@
     "access": "public"
   },
   "bin": {
-    "voicemaster-server": "./dist/server.js"
+    "voicemaster-server": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsup src/server.ts --format cjs --dts --clean",
-    "dev": "tsup src/server.ts --format cjs --dts --watch",
-    "start": "node dist/server.js",
+    "build": "tsup src/server.ts src/cli.ts --format cjs --dts --clean",
+    "dev": "tsup src/server.ts src/cli.ts --format cjs --dts --watch",
+    "start": "node dist/cli.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [

@@ -1,34 +1,13 @@
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+#!/usr/bin/env node
 
 // src/server.ts
-var server_exports = {};
-__export(server_exports, {
-  SignalingServer: () => SignalingServer
-});
-module.exports = __toCommonJS(server_exports);
 var import_ws = require("ws");
 var import_crypto = require("crypto");
 var SignalingServer = class {
   rooms = /* @__PURE__ */ new Map();
-  constructor(port = 3001) {
-    const wss = new import_ws.WebSocketServer({ port });
-    console.log("VoiceMaster signaling server started on port", port);
+  constructor(port2 = 3001) {
+    const wss = new import_ws.WebSocketServer({ port: port2 });
+    console.log("VoiceMaster signaling server started on port", port2);
     wss.on("connection", (ws, req) => {
       const url = new URL(req.url || "", `http://${req.headers.host}`);
       const userId = url.searchParams.get("userId") || (0, import_crypto.randomUUID)();
@@ -77,7 +56,9 @@ var SignalingServer = class {
     });
   }
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  SignalingServer
-});
+
+// src/cli.ts
+var port = parseInt(
+  process.argv.find((arg) => arg === "--port") ? process.argv[process.argv.indexOf("--port") + 1] : process.env.PORT || "3001"
+);
+new SignalingServer(port);
