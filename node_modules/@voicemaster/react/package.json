@@ -1,6 +1,6 @@
 {
   "name": "@voicemaster/react",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "React hooks for VoiceMaster voice communication",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",

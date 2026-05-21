@@ -28,11 +28,7 @@ function useVoice(options) {
       setRemoteStream(stream);
     });
     client.on("userJoined", (userId) => {
-<<<<<<< HEAD
       setPeers((prev) => prev.includes(userId) ? prev : [...prev, userId]);
-=======
-      setPeers((prev) => [...prev, userId]);
->>>>>>> dd8b84457c8d4edb5d353b32e941d030d53668ee
     });
     client.on("userLeft", (userId) => {
       setPeers((prev) => prev.filter((id) => id !== userId));

@@ -1,6 +1,6 @@
 {
   "name": "@voicemaster/server",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Signaling server for VoiceMaster voice communication",
   "main": "./dist/server.js",
   "types": "./dist/server.d.ts",
